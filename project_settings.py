@@ -18,7 +18,7 @@ class DatasetConfig(object):
         self.name = name
 
         if name == 'AUS':
-            self.sent_max_len = 1200
+            self.sent_max_len = 1000000
             # self.extractive_max_len = 38  # 99.5th percentile of reviews
             self.item_min_sent = 10
             self.item_max_sent = 500  # 90th percentile
@@ -34,14 +34,45 @@ class DatasetConfig(object):
 
 
 
-class HParams(object):
-    def __init__(self):
+
+
+class ExpConfig(object):
+    def __init__(self, model_type):
         ###############################################
         #
         # MODEL GENERAL
         #
         ###############################################
-        self.model_type = 'mlstm'  # mlstm, transformer
+        self.model_type =  model_type #'MeanModel'  # mlstm, transformer
+        self.lr = 0.001
+        self.epochs = 10;
+        self.uri = "prajjwal1/bert-tiny"
+        self.hidden_dropout_prob = 0.1
+        self.transformer={}
+        self.seq_length=512
+        self.n_sent=12
+
+        if self.model_type == "MeanModel":
+            self.transformer["truncation"] = True
+            self.transformer["padding"]="max_length"
+            self.transformer["max_length"] = 5120
+
+        elif self.model_type == "Baseline":
+            self.transformer["truncation"] = True
+            self.transformer["padding"]="max_length"
+            self.transformer["max_length"] = 512
+
+
+
+
+
+
+
+
+
+
+
+
         self.emb_size = 256
         self.hidden_size = 512
 

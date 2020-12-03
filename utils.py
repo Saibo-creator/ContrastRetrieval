@@ -16,6 +16,8 @@ import subprocess
 import sys
 import uuid
 import re
+import numpy as np
+import torch
 
 from project_settings import EOS_TOK,EOC_TOK
 
@@ -80,3 +82,32 @@ def list_all_files(dir_path):
     fnames=os.listdir(dir_path)
     fpaths=[dir_path+fname for fname in fnames]
     return fpaths
+
+
+
+def chunkify(encoded_sentence_a):
+    n_input=len(encoded_sentence_a)
+    max_length=len(encoded_sentence_a["input_ids"][0])
+    n_chunk=int(np.ceil(max_length/512))
+    dim2_tensor=torch.cat([list(encoded_sentence_a.values())[i][0] for i in range(n_input)],axis=0).view(-1,max_length)
+    chunk_indices_=[dim2_tensor[:,i*512:(i+1)*512]for i in range(n_chunk)]
+    chunk_indices=[transform_chunk_to_dict(chunk_indices_[i]) for i in range(n_chunk)]
+    return chunk_indices
+
+def transform_chunk_to_dict(chunk):
+    n,dim=chunk.size()
+    chunk_dict={}
+    chunk_dict["input_ids"]=chunk[0].unsqueeze(0)
+    chunk_dict["token_type_ids"]=chunk[1].unsqueeze(0)
+    chunk_dict["attention_mask"]=chunk[2].unsqueeze(0)
+    return chunk_dict
+
+def encode_chunks(chunk_indices,encoder):
+    chunk_embeddings=[]
+    for i, chunk_indice in enumerate(chunk_indices):
+        _, chunk_embedding = encoder(**chunk_indices[i])  # [1, 768]
+        chunk_embeddings.append(torch.squeeze(chunk_embedding))
+    chunk_embeddings = torch.stack(chunk_embeddings, dim=0)
+    # return a tensor of size [n_chunks, 728]
+    return chunk_embeddings
+

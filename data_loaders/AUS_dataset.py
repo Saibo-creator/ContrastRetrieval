@@ -1,4 +1,4 @@
-from project_settings import HParams, DatasetConfig
+from project_settings import ExpConfig, DatasetConfig
 from utils import copy_file,save_file,load_file,list_all_files
 import re
 import os
