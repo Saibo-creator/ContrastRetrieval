@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ContrastRetrieval.iml" filepath="$PROJECT_DIR$/.idea/ContrastRetrieval.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ContrastiveRetrieval.iml" filepath="$PROJECT_DIR$/.idea/ContrastiveRetrieval.iml" />
     </modules>
   </component>
 </project>

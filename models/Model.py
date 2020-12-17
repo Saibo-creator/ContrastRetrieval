@@ -3,7 +3,35 @@ import torch.nn as nn
 import torch.nn.functional as F
 from models.BasicModule import BasicModule
 from transformers import AutoTokenizer, AutoModel
+from project_settings import ExpConfig 
 
+
+
+class NN(nn.Module):
+    def __init__(self, input_size, output_size, device, modelConfig):
+        """
+
+        :type output_size:  int
+        """
+        super(NN, self).__init__()
+        self.modelConfig = modelConfig
+        self.tokenizer = AutoTokenizer.from_pretrained(modelConfig.encoder_uri)
+        self.encoder = AutoModel.from_pretrained(modelConfig.encoder_uri)
+        self.hidden_size=modelConfig.n_hidden
+        self.nn1 = nn.Linear(input_size, self.hidden_size)
+        self.nn2 = nn.Linear(self.hidden_size, output_size)
+        self.dropout = nn.Dropout(p=modelConfig.hidden_dropout_prob)
+        
+
+    def forward(self, x):
+        x = self.nn1(x)
+        x=self.dropout(x)
+        output = self.nn2(x)
+        
+        if self.modelConfig.normalize_emb:
+            output=l2norm(output)
+        
+        return output
 
 class MeanModel(BasicModule):
     def __init__(self, config):
@@ -122,3 +150,10 @@ class DPCNN(BasicModule):
         x = self.linear_out(x)
 
         return x
+    
+def l2norm(X):
+    """L2-normalize columns of X
+    """
+    norm = torch.pow(X, 2).sum(dim=1, keepdim=True).sqrt()
+    X = torch.div(X, norm)
+    return X

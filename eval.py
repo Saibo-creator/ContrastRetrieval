@@ -82,6 +82,8 @@ if __name__ == '__main__':
             sentence_embedding_a = torch.mean(chunk_embeddings_a, dim=0).unsqueeze(0)
             sentence_embedding_b = torch.mean(chunk_embeddings_b, dim=0).unsqueeze(0)
 
+            del sentence_indices_a,sentence_indices_b,_,
+            del chunk_indices_a, chunk_indices_b, chunk_embeddings_a, chunk_embeddings_b
 
         left_left = torch.cdist(sentence_embedding_a, batch_catchphrase_embedding_a, p=2.0)  # [1, 768]*[7, 768]=[1, 7]
         left_right = torch.cdist(sentence_embedding_a, batch_catchphrase_embedding_b,
@@ -97,3 +99,5 @@ if __name__ == '__main__':
 
         print("Test micro contrast: {}".format(test_micro_contrast / nb_test_steps))
         print("Test macro contrast: {}".format(test_macro_contrast / nb_test_steps))
+
+        del left_left, left_right, right_right, right_left
